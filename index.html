@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            text-align: center;
+        }
+        input[type="file"] {
+            margin: 20px;
+        }
+        .result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sign Language Prediction</h1>
+    <p>Upload an image of a hand gesture for prediction.</p>
+    
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" id="file" accept="image/*" required>
+        <button type="submit">Upload Image</button>
+    </form>
+
+    <div class="result" id="result" style="display: none;">
+        <h3>Predicted Letter: <span id="predictedLabel"></span></h3>
+        <p>Confidence: <span id="confidence"></span></p>
+    </div>
+
+    <script>
+        document.getElementById("uploadForm").onsubmit = async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            formData.append("file", document.getElementById("file").files[0]);
+
+            const response = await fetch("/predict", {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await response.json();
+
+            if (result.error) {
+                alert(result.error);
+            } else {
+                document.getElementById("predictedLabel").textContent = result.predicted_label;
+                document.getElementById("confidence").textContent = result.confidence.toFixed(2);
+                document.getElementById("result").style.display = "block";
+            }
+        };
+    </script>
+</body>
+</html>
